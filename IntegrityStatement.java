@@ -11,7 +11,7 @@ public final class IntegrityStatement {
          *  work contains code/answers that is not my own".
          */
     	
-        String sign = ""; // <- Fill in your name and ID here! For example: "Israel Israeli (123456789)"
+        String sign = "Dolev Rubin (319127379)"; // <- Fill in your name and ID here! For example: "Israel Israeli (123456789)"
         if (sign.length() == 0) {
             throw new UnsupportedOperationException("You didn't sign the integrity statement!");
         }
