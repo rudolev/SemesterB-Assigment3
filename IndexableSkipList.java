@@ -7,17 +7,34 @@ public class IndexableSkipList extends AbstractSkipList {
 	
 	@Override
     public void decreaseHeight() {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        if (head.height() >= 0 && head.getNext(head.height()) == tail) {
+            head.removeLevel();
+            tail.removeLevel();
+        }
     }
 
     @Override
     public SkipListNode find(int key) {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        SkipListNode currentNode = head;
+        int level = head.height();
+
+        while (level >= 0) {
+            while (currentNode.getNext(level) != tail && currentNode.getNext(level).key() <= key) {
+                currentNode = currentNode.getNext(level);
+            }
+            level--;
+        }
+
+        return currentNode;
     }
 
     @Override
     public int generateHeight() {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        int height = 0;
+        while (Math.random() < p && height <= head.height()) {
+            height++;
+        }
+        return height;
     }
 
     public int rank(int key) {
