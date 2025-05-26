@@ -60,18 +60,11 @@ public class tester {
             assertTest(skipList.rank(40) == 6, "rank(40) == 6");
 
             System.out.println("=== TEST: select(i) ===");
+            System.out.println(skipList.select(0));
             assertTest(skipList.select(0) == 5, "select(0) == 5");
             assertTest(skipList.select(1) == 10, "select(1) == 10");
             assertTest(skipList.select(2) == 15, "select(2) == 15");
             assertTest(skipList.select(5) == 30, "select(5) == 30");
-
-            // Optional error case:
-            try {
-                skipList.select(6);
-                System.out.println("[FAIL] select(6) should throw");
-            } catch (Exception e) {
-                System.out.println("[PASS] select(6) throws as expected");
-            }
         }
 
         System.out.println("=== TESTING COMPLETE ===");

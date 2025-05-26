@@ -37,31 +37,34 @@ public class IndexableSkipList extends AbstractSkipList {
         return height;
     }
 
-    private int countUntilFind(int key) {
-        int counter = 0;
-        SkipListNode currentNode = head;
-        int level = head.height();
+    public int rank(int key) {
+        SkipListNode curr = head;
+        int rank = 0;
 
-        while (level >= 0) {
-            while (currentNode.getNext(level) != tail && currentNode.getNext(level).key() <= key) {
-                int prevKey = currentNode.key();
-                currentNode = currentNode.getNext(level);
-                if (prevKey != currentNode.key())
-                    counter += 1;
+        for (int level = head.height(); level >= 0; level--) {
+            while (curr.getNext(level) != tail && curr.getNext(level).key() < key) {
+                rank += curr.getWidth(level);
+                curr = curr.getNext(level);
             }
-            level--;
         }
 
-        System.out.println(counter);
-        return counter;
+        return rank;
     }
 
-    public int rank(int key) {
-        return countUntilFind(key);
-    }
 
     public int select(int index) {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        SkipListNode curr = head;
+        int rank = -1;
+
+        for (int level = head.height(); level >= 0; level--) {
+            while (curr.getNext(level) != tail && rank + curr.getWidth(level) <= index) {
+                rank += curr.getWidth(level);
+                curr = curr.getNext(level);
+            }
+        }
+
+        return curr.key();
     }
+
 
 }

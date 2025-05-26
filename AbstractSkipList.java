@@ -37,23 +37,39 @@ abstract public class AbstractSkipList {
             increaseHeight();
         }
 
-        SkipListNode prevNode = find(key);
-        if (prevNode.key() == key) {
-            return null;
+        SkipListNode[] update = new SkipListNode[head.height() + 1];
+        int[] steps = new int[head.height() + 1];
+        SkipListNode curr = head;
+        int totalSteps = 0;
+
+        for (int level = head.height(); level >= 0; level--) {
+            while (curr.getNext(level) != tail && curr.getNext(level).key() < key) {
+                totalSteps += curr.getWidth(level);
+                curr = curr.getNext(level);
+            }
+            update[level] = curr;
+            steps[level] = totalSteps;
         }
 
+        if (curr.getNext(0).key() == key) return null;
+
         SkipListNode newNode = new SkipListNode(key);
+        for (int i = 0; i <= nodeHeight; i++) {
+            SkipListNode prev = update[i];
+            SkipListNode next = prev.getNext(i);
 
-        for (int level = 0; level <= nodeHeight && prevNode != null; ++level) {
-            SkipListNode nextNode = prevNode.getNext(level);
+            newNode.addLevel(next, prev);
+            prev.setNext(i, newNode);
+            next.setPrev(i, newNode);
 
-            newNode.addLevel(nextNode, prevNode);
-            prevNode.setNext(level, newNode);
-            nextNode.setPrev(level, newNode);
+            int skipped = steps[0] - steps[i];
 
-            while (prevNode != null && prevNode.height() == level) {
-                prevNode = prevNode.getPrev(level);
-            }
+            newNode.setWidth(i, prev.getWidth(i) - skipped);
+            prev.setWidth(i, skipped + 1);
+        }
+
+        for (int i = nodeHeight + 1; i <= head.height(); i++) {
+            update[i].setWidth(i, update[i].getWidth(i) + 1);
         }
 
         return newNode;
@@ -134,12 +150,14 @@ abstract public class AbstractSkipList {
         final private List<SkipListNode> next;
         final private List<SkipListNode> prev;
         private int height;
+        private List<Integer> width;
 
         public SkipListNode(int key) {
         	super(key);
             next = new ArrayList<>();
             prev = new ArrayList<>();
             this.height = -1;
+            width = new ArrayList<>();
             
         }
 
@@ -179,6 +197,7 @@ abstract public class AbstractSkipList {
             ++height;
             this.next.add(next);
             this.prev.add(prev);
+            this.width.add(1);
         }
 		
 		public void removeLevel() {           
@@ -188,5 +207,11 @@ abstract public class AbstractSkipList {
         }
 
         public int height() { return height; }
+
+        public int getWidth(int level) { return width.get(level); }
+
+        public void setWidth(int level, int w) {
+            width.set(level, w);
+        }
     }
 }
