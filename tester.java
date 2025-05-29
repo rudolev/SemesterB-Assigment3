@@ -98,7 +98,7 @@ public class tester {
         }
 
         {
-            System.out.println("=== MASSIVE TESTING: HashTable INSERT/SEARCH/DELETE ===");
+            System.out.println("=== MASSIVE TESTING: ChainedHashTable INSERT/SEARCH/DELETE ===");
 
             ModularHash modularHash = new ModularHash();
             HashTable<Integer, String> table = new ChainedHashTable<>(modularHash);
@@ -154,7 +154,7 @@ public class tester {
 
 
         {
-            System.out.println("=== TESTING ChainedHashTable IMPLEMENTATION ===");
+            System.out.println("=== TESTING ProbingHashTable IMPLEMENTATION ===");
 
             ModularHash modularHash = new ModularHash();
             HashTable<Integer, String> table = new ProbingHashTable<>(modularHash);
@@ -183,7 +183,7 @@ public class tester {
         }
 
         {
-            System.out.println("=== MASSIVE TESTING: HashTable INSERT/SEARCH/DELETE ===");
+            System.out.println("=== MASSIVE TESTING: ProbingHashTable HashTable INSERT/SEARCH/DELETE ===");
 
             ModularHash modularHash = new ModularHash();
             HashTable<Integer, String> table = new ProbingHashTable<>(modularHash);
@@ -236,6 +236,61 @@ public class tester {
 
             System.out.println("Mass test complete.");
         }
+
+        {
+            System.out.println("=== TESTING ProbingHashTable ===");
+
+            HashFactory<Integer> factory = new ModularHash();
+            ProbingHashTable<Integer, String> table = new ProbingHashTable<>(factory, 4, 0.75);
+
+            // Insert some elements
+            System.out.println("Inserting keys 1 to 5...");
+            for (int i = 1; i <= 5; i++) {
+                table.insert(i, "val" + i);
+            }
+
+            // Search test
+            for (int i = 1; i <= 5; i++) {
+                assertTest(("val" + i).equals(table.search(i)), "Search key " + i);
+            }
+
+            // Update key
+            System.out.println("Updating key 3...");
+            table.insert(3, "updated");
+            assertTest("updated".equals(table.search(3)), "Updated key 3");
+
+            // Delete some keys
+            System.out.println("Deleting keys 2 and 4...");
+            assertTest(table.delete(2), "Delete key 2");
+            assertTest(table.delete(4), "Delete key 4");
+
+            assertTest(table.search(2) == null, "Search deleted key 2");
+            assertTest(table.search(4) == null, "Search deleted key 4");
+
+            // Insert more keys to test tombstone reuse
+            System.out.println("Inserting key 6 (reuses tombstone?)...");
+            table.insert(6, "val6");
+            assertTest("val6".equals(table.search(6)), "Search key 6");
+
+            // Insert a lot to trigger rehash
+            System.out.println("Inserting many keys to trigger rehash...");
+            int base = 100;
+            for (int i = base; i < base + 50; i++) {
+                table.insert(i, "val" + i);
+            }
+
+            assertTest(table.capacity() > 16, "Capacity increased after rehash");
+
+            // Check a few random rehashed values
+            assertTest("val105".equals(table.search(105)), "Search rehashed key 105");
+            assertTest("val109".equals(table.search(109)), "Search rehashed key 109");
+
+            // Search for non-existing
+            assertTest(table.search(9999) == null, "Search missing key 9999");
+
+            System.out.println("All probing hash table tests done.");
+        }
+
         System.out.println("=== TESTING COMPLETE ===");
 
     }
