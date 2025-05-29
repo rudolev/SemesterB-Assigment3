@@ -28,7 +28,7 @@ public class ChainedHashTable<K, V> implements HashTable<K, V> {
     private void rehashTable() {
         int newCapacity = capacity * 2;
         List<Element<K,V>>[] newTable = new List[newCapacity];
-        HashFunctor<K> newHashFunc = hashFactory.pickHash(currentK);
+        HashFunctor<K> newHashFunc = hashFactory.pickHash(currentK + 1);
 
         for (int i = 0; i < newCapacity; i++) {
             newTable[i] = new LinkedList();
@@ -44,6 +44,7 @@ public class ChainedHashTable<K, V> implements HashTable<K, V> {
         table = newTable;
         capacity = newCapacity;
         hashFunc = newHashFunc;
+        currentK += 1;
     }
 
     public ChainedHashTable(HashFactory<K> hashFactory) {
