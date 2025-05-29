@@ -1,3 +1,5 @@
+import java.awt.geom.NoninvertibleTransformException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,9 +13,21 @@ public class ChainedHashTable<K, V> implements HashTable<K, V> {
     private HashFunctor<K> hashFunc;
     private List<Element<K,V>>[] table;
 
-    /*
-     * You should add additional private fields as needed.
-     */
+    // My fields
+    final private double loadFactor = 1.5;
+    private int numOfItems = 0;
+
+    private double calculateLoadFactor() {
+        return (double) numOfItems / capacity();
+    }
+
+    private boolean needsRehashing() {
+        return loadFactor < calculateLoadFactor();
+    }
+
+    private void rehashTable() {
+
+    }
 
     public ChainedHashTable(HashFactory<K> hashFactory) {
         this(hashFactory, DEFAULT_INIT_CAPACITY, DEFAULT_MAX_LOAD_FACTOR);
@@ -26,18 +40,39 @@ public class ChainedHashTable<K, V> implements HashTable<K, V> {
         this.hashFunc = hashFactory.pickHash(k);
         this.table = new List[this.capacity];
 
+        for (int i = 0; i < this.capacity; i++) {
+            table[i] = new LinkedList();
+        }
     }
 
     public V search(K key) {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        int hashedKey = hashFunc.hash(key);
+        for (Element<K, V> currentElement : table[hashedKey]) {
+            if (currentElement.key().equals(key))
+                return currentElement.satelliteData();
+        }
+        return null;
     }
 
     public void insert(K key, V value) {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        int hashedKey = hashFunc.hash(key);
+        table[hashedKey].add(new Element<K, V>(key, value));
+        numOfItems += 1;
+
+        if (needsRehashing()) {
+            rehashTable();
+        }
     }
 
     public boolean delete(K key) {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        int hashedKey = hashFunc.hash(key);
+        for (Element<K, V> currentElement : table[hashedKey]) {
+            if (currentElement.key().equals(key)) {
+                table[hashedKey].remove(currentElement);
+                return true;
+            }
+        }
+        return false;
     }
 
     public HashFunctor<K> getHashFunc() {

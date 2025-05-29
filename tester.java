@@ -1,4 +1,4 @@
-
+import java.util.*;
 
 public class tester {
     public static void main(String[] args) {
@@ -67,7 +67,95 @@ public class tester {
             assertTest(skipList.select(5) == 30, "select(5) == 30");
         }
 
+        {
+            System.out.println("=== TESTING ChainedHashTable IMPLEMENTATION ===");
+
+            ModularHash modularHash = new ModularHash();
+            HashTable<Integer, String> table = new ChainedHashTable<>(modularHash);
+
+            System.out.println("Inserting key-value pairs...");
+            table.insert(1, "one");
+            table.insert(2, "two");
+            table.insert(3, "three");
+
+            assertTest("one".equals(table.search(1)), "Search key 1 == one");
+            assertTest("two".equals(table.search(2)), "Search key 2 == two");
+            assertTest("three".equals(table.search(3)), "Search key 3 == three");
+            assertTest(table.search(99) == null, "Search key 99 == null");
+
+            System.out.println("Deleting key 2...");
+            assertTest(table.delete(2), "Delete key 2 succeeds");
+            assertTest(table.search(2) == null, "Search key 2 == null after delete");
+
+            System.out.println("Re-inserting key 2...");
+            table.insert(2, "TWO");
+            assertTest("TWO".equals(table.search(2)), "Search key 2 == TWO (after reinsertion)");
+
+            System.out.println("Testing capacity and hash function...");
+            assertTest(table.capacity() > 0, "Capacity > 0");
+            assertTest(table.getHashFunc() != null, "Hash function is not null");
+        }
+
+
+        {
+            System.out.println("=== MASSIVE TESTING: HashTable INSERT/SEARCH/DELETE ===");
+
+            ModularHash modularHash = new ModularHash();
+            HashTable<Integer, String> table = new ChainedHashTable<>(modularHash);
+
+            int numEntries = 1000;
+            Random rand = new Random(42); // fixed seed for repeatability
+
+            List<Integer> keys = new ArrayList<>();
+            Map<Integer, String> expected = new HashMap<>();
+
+            // Insert unique keys
+            while (keys.size() < numEntries) {
+                int key = rand.nextInt(10_000);
+                if (!expected.containsKey(key)) {
+                    String value = "val" + key;
+                    keys.add(key);
+                    expected.put(key, value);
+                    table.insert(key, value);
+                }
+            }
+
+            System.out.println("Inserted " + keys.size() + " unique key-value pairs.");
+
+            // Search and validate
+            for (int key : keys) {
+                String expectedVal = expected.get(key);
+                String actualVal = table.search(key);
+                assertTest(expectedVal.equals(actualVal), "Search key " + key + " == " + expectedVal);
+            }
+
+            // Test missing keys
+            for (int i = 0; i < 100; i++) {
+                int fakeKey = 100_000 + i;
+                assertTest(table.search(fakeKey) == null, "Search non-existent key " + fakeKey + " == null");
+            }
+
+            // Delete half the keys and validate
+            for (int i = 0; i < keys.size(); i += 2) {
+                int key = keys.get(i);
+                assertTest(table.delete(key), "Delete key " + key + " success");
+                assertTest(table.search(key) == null, "Search deleted key " + key + " == null");
+            }
+
+            // Check the remaining keys are still intact
+            for (int i = 1; i < keys.size(); i += 2) {
+                int key = keys.get(i);
+                String val = expected.get(key);
+                assertTest(val.equals(table.search(key)), "Key " + key + " still exists after deletion");
+            }
+
+            System.out.println("Mass test complete.");
+        }
+
+
+
         System.out.println("=== TESTING COMPLETE ===");
+
     }
 
     private static void assertTest(boolean condition, String description) {
