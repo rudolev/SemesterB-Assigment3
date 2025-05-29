@@ -14,19 +14,36 @@ public class ChainedHashTable<K, V> implements HashTable<K, V> {
     private List<Element<K,V>>[] table;
 
     // My fields
-    final private double loadFactor = 1.5;
     private int numOfItems = 0;
+    private int currentK;
 
     private double calculateLoadFactor() {
         return (double) numOfItems / capacity();
     }
 
     private boolean needsRehashing() {
-        return loadFactor < calculateLoadFactor();
+        return maxLoadFactor < calculateLoadFactor();
     }
 
     private void rehashTable() {
+        int newCapacity = capacity * 2;
+        List<Element<K,V>>[] newTable = new List[newCapacity];
+        HashFunctor<K> newHashFunc = hashFactory.pickHash(currentK);
 
+        for (int i = 0; i < newCapacity; i++) {
+            newTable[i] = new LinkedList();
+        }
+
+        for (int i = 0; i < capacity; i++) {
+            for (Element<K, V> elm : table[i]) {
+                int hashedKey = newHashFunc.hash(elm.key());
+                newTable[hashedKey].add(elm);
+            }
+        }
+
+        table = newTable;
+        capacity = newCapacity;
+        hashFunc = newHashFunc;
     }
 
     public ChainedHashTable(HashFactory<K> hashFactory) {
@@ -36,6 +53,7 @@ public class ChainedHashTable<K, V> implements HashTable<K, V> {
     public ChainedHashTable(HashFactory<K> hashFactory, int k, double maxLoadFactor) {
         this.hashFactory = hashFactory;
         this.maxLoadFactor = maxLoadFactor;
+        currentK = k;
         this.capacity = 1 << k;
         this.hashFunc = hashFactory.pickHash(k);
         this.table = new List[this.capacity];

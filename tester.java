@@ -96,7 +96,6 @@ public class tester {
             assertTest(table.getHashFunc() != null, "Hash function is not null");
         }
 
-
         {
             System.out.println("=== MASSIVE TESTING: HashTable INSERT/SEARCH/DELETE ===");
 
@@ -151,9 +150,7 @@ public class tester {
 
             System.out.println("Mass test complete.");
         }
-
-
-
+        
         System.out.println("=== TESTING COMPLETE ===");
 
     }
