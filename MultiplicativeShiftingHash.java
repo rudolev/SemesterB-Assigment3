@@ -4,12 +4,12 @@ public class MultiplicativeShiftingHash implements HashFactory<Long> {
     private HashingUtils utils;
 
     public MultiplicativeShiftingHash() {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        utils = new HashingUtils();
     }
 
     @Override
     public HashFunctor<Long> pickHash(int k) {
-        throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+        return new Functor(k);
     }
 
     public class Functor implements HashFunctor<Long> {
@@ -18,11 +18,12 @@ public class MultiplicativeShiftingHash implements HashFactory<Long> {
         final private long k;
 
         public Functor(int k) {
-            throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+            this.k = k;
+            a = utils.genUniqueIntegers(1)[0];
         }
         @Override
         public int hash(Long key) {
-            throw new UnsupportedOperationException("Delete this line and replace it with your implementation");
+            return (int)(a * key) >>> (WORD_SIZE - k);
         }
 
         public long a() {
