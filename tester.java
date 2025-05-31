@@ -290,7 +290,13 @@ public class tester {
 
             System.out.println("All probing hash table tests done.");
         }
-
+        {
+            System.out.println("=== TESTING measureInsertionsProbing ===");
+            System.out.println("Insertion probing: " + Arrays.toString(HashingExperimentUtils.measureInsertionsProbing()));
+            System.out.println("Search probing: " + Arrays.toString(HashingExperimentUtils.measureSearchesProbing()));
+            System.out.println("Insertion chaining: " + Arrays.toString(HashingExperimentUtils.measureInsertionsChaining()));
+            System.out.println("Search chaining: " + Arrays.toString(HashingExperimentUtils.measureSearchesChaining()));
+        }
         System.out.println("=== TESTING COMPLETE ===");
 
     }

@@ -5,7 +5,7 @@ public class ProbingHashTable<K, V> implements HashTable<K, V> {
     final private double maxLoadFactor;
     private int capacity;
     private HashFunctor<K> hashFunc;
-    private Element<K,V>[] table;
+    private Element<K, V>[] table;
 
     // My fields
     private int size;
@@ -64,9 +64,7 @@ public class ProbingHashTable<K, V> implements HashTable<K, V> {
                 table[index] = new Element<>(key, value);
                 size++;
                 finishedInsert = true;
-            }
-
-            else if (table[index].key().equals(key)) {
+            } else if (table[index].key().equals(key)) {
                 table[index].setSatData(value); // update existing key
                 finishedInsert = true;
             }
@@ -124,5 +122,7 @@ public class ProbingHashTable<K, V> implements HashTable<K, V> {
         return hashFunc;
     }
 
-    public int capacity() { return capacity; }
+    public int capacity() {
+        return capacity;
+    }
 }
